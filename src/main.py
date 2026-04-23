@@ -66,6 +66,7 @@ if __name__ == "__main__":
         # 4. Verificar o resultado final da limpeza
         print("--- Primeiras 5 linhas do dataset limpo ---")
         print(dados_finais.head())
+
         # Guardar o ficheiro unificado para a próxima fase (opcional)
         # dataset_completo.to_csv('../data/dataset_unificado.csv', index=False)
 
