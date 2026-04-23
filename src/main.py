@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 import os
 
 
@@ -18,6 +19,14 @@ def carregar_dados():
 
     return df_pacientes, df_dieta, df_nutricionistas, df_resultados
 
+def valores_em_falta(df: pd.DataFrame) -> pd.DataFrame:
+
+    print(df.isnull().sum())
+
+    return df
+
+
+
 
 def integrar_dados(df_pac, df_dieta, df_nut, df_res):
     # 1. Unir Pacientes com Resultados
@@ -34,41 +43,33 @@ def integrar_dados(df_pac, df_dieta, df_nut, df_res):
     return df_final
 
 
-def limpar_e_processar(df):
-    # 1. Verificar valores nulos
-    print("Valores em falta antes:\n", df.isnull().sum())
-    df = df.dropna()  # Opção simples: remover linhas com buracos
-
-    # 2. Remover colunas redundantes (exemplo)
-    # Se o merge criou colunas duplicadas como 'id_paciente_x' e 'id_paciente_y'
-    # df = df.drop(columns=['coluna_desnecessaria'])
-
-    # 3. Tratar Outliers (Exemplo: Idades negativas ou acima de 120)
-    # df = df[(df['idade'] > 0) & (df['idade'] < 120)]
-
-    print("Limpeza concluída!")
-    return df
-
-
 if __name__ == "__main__":
     try:
-        # Passo 1: Carregar
-        p, d, n, r = carregar_dados()
+        print("valores em falta no CSV: patients")
+        df_pacientes = pd.read_csv("../data/patients.csv")
+        df_limpo_pac = valores_em_falta(df_pacientes)
 
+        print("valores em falta no CSV: nutritionists")
+        df_nutricionistas = pd.read_csv('../data/nutritionists.csv')
+        df_limpo_nutri = valores_em_falta(df_nutricionistas)
+
+        print("Valores em falta no CSV: diets")
+        df_dietas = pd.read_csv('../data/diets.csv')
+        df_limpo_dieta = valores_em_falta(df_dietas)
+
+        print("valores em falta no CSV: outcomes")
+        df_resultado = pd.read_csv('../data/outcomes.csv')
+        df_limpo_resultados = valores_em_falta(df_resultado)
+
+
+        df_count = df_resultado['patient_id'].value_counts()
+        print(df_count)
+
+
+        p, d, n, r = carregar_dados()
         # Passo 2: Integrar
         dataset_completo = integrar_dados(p, d, n, r)
 
-        # Passo 3: Ver as primeiras linhas para confirmar
-
-
-        dados_finais = limpar_e_processar(dataset_completo)
-
-        # 4. Verificar o resultado final da limpeza
-        print("--- Primeiras 5 linhas do dataset limpo ---")
-        print(dados_finais.head())
-
-        # Guardar o ficheiro unificado para a próxima fase (opcional)
-        # dataset_completo.to_csv('../data/dataset_unificado.csv', index=False)
 
     except FileNotFoundError as e:
         print(f"Erro: Não foi possível encontrar os ficheiros. Verifique o caminho. {e}")
