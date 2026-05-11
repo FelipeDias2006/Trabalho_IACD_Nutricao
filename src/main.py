@@ -26,6 +26,56 @@ def valores_em_falta(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def consistencia_rep(df: pd.DataFrame) -> pd.DataFrame:
+    if "sex" in df.columns:
+        # 1. Limpeza básica (o que já tinhas)
+        df["sex"] = df["sex"].astype(str).str.strip().str.capitalize()
+
+        # 2. Mapeamento para uniformizar (A SOLUÇÃO)
+        mapeamento = {
+            'Female': 'F',
+            'Male': 'M',
+        }
+
+        # O 'replace' substitui os valores longos pelos curtos
+        df["sex"] = df["sex"].replace(mapeamento)
+
+        print("\nValores únicos de 'sex' após uniformização:")
+        print(df["sex"].unique())
+
+    return df
+
+
+def outliers_iqr(df: pd.DataFrame):
+    print("\n" + "=" * 55)
+    print("Deteção de outliers — Método IQR")
+    print("=" * 55)
+
+    # Escolha uma coluna numérica real, como 'weight_loss' ou 'age'
+    col = "baseline_weight_kg"
+
+    # Correção da lógica Q3 - Q1
+    Q1 = df[col].quantile(0.25)
+    Q3 = df[col].quantile(0.75)
+    IQR = Q3 - Q1  # O correto é Q3 menos Q1
+
+    lim_inf = Q1 - 1.5 * IQR
+    lim_sup = Q3 + 1.5 * IQR
+
+    # Filtragem de outliers
+    outliers = df[(df[col] < lim_inf) | (df[col] > lim_sup)]
+
+    print(f"O limete inferior é:{lim_inf}")
+    print(f"O limete superiror é:{lim_sup}")
+
+    print(f"\nOutliers detetados na coluna '{col}':")
+
+    if not outliers.empty:
+        print(outliers[["patient_id", col]].to_string(index=False))
+    else:
+        print("Nenhum outlier detetado.")
+
+    return col, lim_inf, lim_sup, outliers
 
 
 def integrar_dados(df_pac, df_dieta, df_nut, df_res):
@@ -45,31 +95,50 @@ def integrar_dados(df_pac, df_dieta, df_nut, df_res):
 
 if __name__ == "__main__":
     try:
+        print("=" * 55)
         print("valores em falta no CSV: patients")
         df_pacientes = pd.read_csv("../data/patients.csv")
         df_limpo_pac = valores_em_falta(df_pacientes)
 
+        print("=" * 55)
         print("valores em falta no CSV: nutritionists")
         df_nutricionistas = pd.read_csv('../data/nutritionists.csv')
         df_limpo_nutri = valores_em_falta(df_nutricionistas)
 
+        print("=" * 55)
         print("Valores em falta no CSV: diets")
         df_dietas = pd.read_csv('../data/diets.csv')
         df_limpo_dieta = valores_em_falta(df_dietas)
 
+        print("=" * 55)
         print("valores em falta no CSV: outcomes")
         df_resultado = pd.read_csv('../data/outcomes.csv')
         df_limpo_resultados = valores_em_falta(df_resultado)
 
 
-        df_count = df_resultado['patient_id'].value_counts()
+        print("="*55)
+        print("Valores repetidos:")
+        df_count = df_resultado['program_id'].value_counts()
+        print(df_count)
+
+        print("=" * 55)
+        print("Valores repetidos:")
+        df_count = df_pacientes['patient_id'].value_counts()
         print(df_count)
 
 
         p, d, n, r = carregar_dados()
-        # Passo 2: Integrar
-        dataset_completo = integrar_dados(p, d, n, r)
 
+        dataset_completo = integrar_dados(p, d, n, r)
+        dataset_completo = consistencia_rep(dataset_completo)
+
+        col, lim_inf, lim_sup, outliers = outliers_iqr(dataset_completo)
+
+        dataset_final = dataset_completo[(dataset_completo[col] >= lim_inf) & (dataset_completo[col] <= lim_sup)]
+
+
+        print(f"Limpeza de outliers na coluna '{col}' concluída!")
+        print(f"Linhas antes: {len(dataset_completo)} | Linhas depois: {len(dataset_final)}")
 
     except FileNotFoundError as e:
         print(f"Erro: Não foi possível encontrar os ficheiros. Verifique o caminho. {e}")
