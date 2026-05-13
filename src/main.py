@@ -19,6 +19,10 @@ def carregar_dados():
 
     return df_pacientes, df_dieta, df_nutricionistas, df_resultados
 
+def analisar_valores_em_falta(df: pd.DataFrame) -> pd.DataFrame:
+    pass
+
+
 def valores_em_falta(df: pd.DataFrame) -> pd.DataFrame:
 
     print(df.isnull().sum())
@@ -109,6 +113,7 @@ if __name__ == "__main__":
         print("Valores em falta no CSV: diets")
         df_dietas = pd.read_csv('../data/diets.csv')
         df_limpo_dieta = valores_em_falta(df_dietas)
+        print(df_dietas.describe())
 
         print("=" * 55)
         print("valores em falta no CSV: outcomes")
@@ -142,5 +147,6 @@ if __name__ == "__main__":
 
     except FileNotFoundError as e:
         print(f"Erro: Não foi possível encontrar os ficheiros. Verifique o caminho. {e}")
+
 
 
