@@ -1,48 +1,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-
-# Função para carregar os dados
-def carregar_dados():
-
-    path_pacientes = '../data/patients.csv'
-    path_dieta = '../data/diets.csv'
-    path_nutricionistas = '../data/nutritionists.csv'
-    path_resultados = '../data/outcomes.csv'
-
-    # Carregar cada ficheiro
-    df_pacientes = pd.read_csv(path_pacientes)
-    df_dieta = pd.read_csv(path_dieta)
-    df_nutricionistas = pd.read_csv(path_nutricionistas)
-    df_resultados = pd.read_csv(path_resultados)
-
-    return df_pacientes, df_dieta, df_nutricionistas, df_resultados
-
-def consistencia_rep(df: pd.DataFrame) -> pd.DataFrame:
-    if "sex" in df.columns:
-        # 1. Limpeza básica (o que já tinhas)
-        df["sex"] = df["sex"].astype(str).str.strip().str.capitalize()
-
-        # 2. Mapeamento para uniformizar (A SOLUÇÃO)
-        mapeamento = {
-            'Female': 'F',
-            'Male': 'M',
-        }
-
-        # O 'replace' substitui os valores longos pelos curtos
-        df["sex"] = df["sex"].replace(mapeamento)
-
-        print("\nValores únicos de 'sex' após uniformização:")
-        print(df["sex"].unique())
-
-    return df
+from main import carregar_dados,consistencia_rep
 
 def dietsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
     # Ver NaN antes de tratar
-    print(df.isnull().sum())
 
+    print("DIETAS:")
+    print("Valores em falta dietsCSV:")
+    print(df.isnull().sum())
+    print("="*50)
     # Verificar relação entre diet_type e as colunas com NaN
     print(df[['diet_type', 'sodium_limit_mg', 'fiber_target_g']])
-
+    print("=" * 50)
     # Imputar pela média do mesmo tipo de dieta
     # fiber_target_g: valores entre 25-38g conforme literatura (25-35g recomendado).
     # O valor em falta é low_carb foi imputado pela média dos outros low_carb
@@ -51,6 +20,7 @@ def dietsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
     df['fiber_target_g'] = df.groupby('diet_type')['fiber_target_g'].transform(lambda x: x.fillna(x.mean()))
 
     # Confirmar que ficou limpo
+    print("Valores em falta dietCSV (ATUALIZADO)")
     print(df.isnull().sum())
 
 def nutritionistsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
@@ -60,7 +30,11 @@ def nutritionistsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[df['nutritionist_id'] == 'N008', 'experience_years'] = 9
 
     #Ver Nan antes de tratar
+
+    print("NUTRICIONISTAS:")
+    print("Valores em falta nutritionistsCSV")
     print(df.isnull().sum())
+    print("=" * 50)
 
     # Criar colunas binárias para investigar padrão dos NaN
     df['approach_falta'] = df['approach'].isnull().astype(int)
@@ -99,16 +73,21 @@ def nutritionistsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop(columns=['approach_falta', 'years_falta', 'specialty_num', 'approach_num'])
 
     # Confirmar que ficou limpo
+    print("Valores em falta nutritionistsCSV (ATUALIZADO)")
     print(df.isnull().sum())
-
+    print("=" * 50)
     print(df)
 
     return df
 
 def patientsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
         # Ver NaN antes de tratar
+        print("PACIENTES:")
+        print("Valores em falta patientsCSV")
         print(df.isnull().sum())
+        print("=" * 50)
         print(df.describe())
+        print("=" * 50)
 
         # Apagar coluna duplicada — bmi_redundant é igual a baseline_bmi
         df = df.drop(columns=['bmi_redundant'])
@@ -143,12 +122,14 @@ def patientsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[df['age'] == 0, 'age'] = mediana_idade
 
         # DETEÇÃO DE OUTLIERS VIA IQR (para mostrar o que sobra)
+
         for col in ['age', 'height_cm', 'baseline_weight_kg', 'baseline_bmi', 'sleep_hours', 'motivation_score']:
             Q1 = df[col].quantile(0.25)
             Q3 = df[col].quantile(0.75)
             IQR = Q3 - Q1
             outliers = df[(df[col] < Q1 - 1.5 * IQR) | (df[col] > Q3 + 1.5 * IQR)]
             if not outliers.empty:
+
                 print(f"\nOutliers restantes em {col}:")
                 print(outliers[['patient_id', col]])
 
@@ -179,15 +160,25 @@ def patientsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
 
         # Apagar colunas auxiliares
         df = df.drop(columns=['age_falta', 'sleep_falta', 'motivation_falta'])
-
+        print("=" * 50)
+        print("Valores em falta patientsCSV (ATUALIZADO)")
         print(df.isnull().sum())
+        print("=" * 50)
         print(df)
         return df
 def outcomesCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
     print(df.isnull().sum())
+
     print(df.describe())
     return df
 
 
 df_pacientes, df_dieta, df_nutricionistas, df_resultados = carregar_dados()
+
 df_pacientes = patientsCSV_limpeza(df_pacientes)
+print("="*50)
+print("="*50)
+df_dieta = dietsCSV_limpeza(df_dieta)
+print("="*50)
+print("="*50)
+df_nutricionistas = nutritionistsCSV_limpeza(df_nutricionistas)
