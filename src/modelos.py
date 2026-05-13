@@ -63,8 +63,8 @@ def avaliar_modelo(modelo_treinado, X_test, y_test):
 
 
 if __name__ == "__main__":
-    # Assumindo que recebe o 'dataset_limpo' dos seus colegas
-    # dataset_limpo = pd.read_csv("dados_limpos_pelos_colegas.csv")
+    # esperar receber os dados limpos
+    # dataset_limpo = pd.read_csv("dados_limpos.csv")
 
     # 1. Separar alvo e características
     X, y = separar_x_y(dataset_limpo)
@@ -72,8 +72,8 @@ if __name__ == "__main__":
     # 2. Dividir em Treino e Teste
     X_train, X_test, y_train, y_test = preparar_dados_treino_teste(X, y)
 
-    # 3 e 4. Treinar o Modelo
+    # 3. Treinar o Modelo
     modelo_final = treinar_modelo(X_train, y_train)
 
-    # 5. Avaliar o Modelo
+    # 4. Avaliar o Modelo
     erro = avaliar_modelo(modelo_final, X_test, y_test)
