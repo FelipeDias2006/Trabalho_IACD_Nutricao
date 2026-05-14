@@ -167,11 +167,31 @@ def patientsCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
         print(df)
         return df
 def outcomesCSV_limpeza(df: pd.DataFrame) -> pd.DataFrame:
-    print(df.isnull().sum())
+    df = df.copy()
 
+    print(df.isnull().sum())
     print(df.describe())
+
+    #Verificar linhas totalmente duplicadas
+    print("Linhas Duplicadas:", df.duplicated().sum())
+
+    #Eliminar mesmas linhas
+    df = df.drop_duplicates()
+    print("Linhas duplicadas após limpeza:", df.duplicated().sum())
+
+    # Verificar se adherence_ratio == mean_adherence_pct / 100
+    # Se as colunas forem iguais, a diferença deve ser ~0 em todas as linhas
+    df['verificacao'] = (df['adherence_ratio'] - df['mean_adherence_pct'] / 100).abs()
+    print(df['verificacao'].describe())
+    df = df.drop(columns=['verificacao'])
+
+    # adherence_ratio == mean_adherence_pct / 100 — colunas redundantes, confirmado matematicamente
+    df = df.drop(columns=['adherence_ratio'])
+
     return df
 
+df_pacientes, df_dieta, df_nutricionistas, df_resultados = carregar_dados()
+df_resultados = outcomesCSV_limpeza(df_resultados)
 
 df_pacientes, df_dieta, df_nutricionistas, df_resultados = carregar_dados()
 
