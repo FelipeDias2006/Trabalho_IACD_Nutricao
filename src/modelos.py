@@ -62,6 +62,35 @@ def avaliar_modelo(modelo_treinado, X_test, y_test):
     return erro_medio
 
 
+#essa função serve para testarmos os tipos de modelos matematicos e avaliarmos qual será o melhor para aprofundar  no projeto
+def testar_varios_modelos(X_train, y_train, X_test, y_test):
+    # Esse aqui é o diconario dos modelos matematicos
+    modelos = {
+        "Regressão Linear": LinearRegression(),
+        "Árvore": DecisionTreeRegressor(random_state=42),
+        "Random Forest": RandomForestRegressor(random_state=42)
+    }
+
+    print("--- A INICIAR TESTES DOS MODELOS ---")
+
+    # ciclo for para testar os 3 modelos matematicos
+    for nome, algoritmo in modelos.items():
+        print(f"\nA avaliar: {nome}")
+
+        # o modelo mat. vai estudar os dados para criar a "formula"
+        algoritmo.fit(X_train, y_train)
+
+        # o algoritmo faz as previsões
+        previsoes = algoritmo.predict(X_test)
+
+        # avaliação do algoritmo
+        erro = mean_absolute_error(y_test, previsoes)
+
+        print(f"Erro médio: {erro:.2f} kg")
+
+    print("\n--- FIM DOS TESTES ---")
+
+
 if __name__ == "__main__":
     # esperar receber os dados limpos
     # dataset_limpo = pd.read_csv("dados_limpos.csv")
