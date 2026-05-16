@@ -1,6 +1,8 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split # ferramenta para dividir aleatoriamente quais dados serão teste e treino
+from sklearn.model_selection import train_test_split, GridSearchCV # ferramenta para dividir aleatoriamente quais dados serão teste e treino e outra para testar a melhor config para o algoritmo
 from sklearn.ensemble import RandomForestRegressor # tem haver com o treino do modelo
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_absolute_error
 
 
@@ -90,19 +92,33 @@ def testar_varios_modelos(X_train, y_train, X_test, y_test):
 
     print("\n--- FIM DOS TESTES ---")
 
+#essa função vai mostar os melhores parametros para o algoritmo
+" usando o random forest regressor como base
+def afinar_modelo_vencedor(X_train,y_train):
+    print("Função de afinamento do algoritmo...")
 
-if __name__ == "__main__":
-    # esperar receber os dados limpos
-    # dataset_limpo = pd.read_csv("dados_limpos.csv")
+    # Vou usar para a construção da função afinamento o RandomForestRegressor apenas como base e teste
+    modelo_base = RandomForestRegressor(random_state=42)
 
-    # 1. Separar alvo e características
-    X, y = separar_x_y(dataset_limpo)
+    # aqui vamos ver qual o melhor parametro para o random forest desempenhar melhor
+    # n_estimators: número de árvores
+    # max_depth: profundidade máxima de cada árvore
+    grelha_de_opcoes = {
+        'n_estimators': [50, 100, 200],
+        'max_depth': [10, 20, None]
+    }
 
-    # 2. Dividir em Treino e Teste
-    X_train, X_test, y_train, y_test = preparar_dados_treino_teste(X, y)
+    # chamamos o mecanico aqui
+    # cv=5 divide os dados em 5 partes para fazer um teste mais rigoroso (Cross-Validation) [cite: 30]
+    mecanico = GridSearchCV(estimator=modelo_base, param_grid=grelha_de_opcoes, cv=5)
 
-    # 3. Treinar o Modelo
-    modelo_final = treinar_modelo(X_train, y_train)
+    # ele agora ajusta os parametros
+    # mandamos o mecânico testar todas as combinações nos dados de treino
+    mecanico.fit(X_train, y_train)
 
-    # 4. Avaliar o Modelo
-    erro = avaliar_modelo(modelo_final, X_test, y_test)
+    # mostrar o resultado do trabalho
+    print("O mecânico encontrou a melhor afinação!")
+    print(f"Os melhores parametros são: {mecanico.best_params_}")
+
+    # a função devolve o modelo super-afinado
+    return mecanico.best_estimator_
