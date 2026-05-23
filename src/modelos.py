@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV # ferramenta 
 from sklearn.ensemble import RandomForestRegressor # tem haver com o treino do modelo
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, r2_score
 
 
 #criar uma função que separe a variavel que queremos prever das outras
@@ -58,10 +58,13 @@ def avaliar_modelo(modelo_treinado, X_test, y_test):
 
     # aqui avaliamos as previsoes do modelo com os dados reais
     erro_medio = mean_absolute_error(y_test, previsoes)
+    # r-quadrado para nos dar a porcentagem de "qualidade" do modelo, o quanto ele consegue acertar
+    nota_r2 = r2_score(y_test, previsoes)
 
     print(f"O modelo erra, em média, as previsões de peso em {erro_medio:.2f} kg.")
-
-    return erro_medio
+    print(f"Precisão do Modelo (R²): {nota_r2 * 100:.2f}%")
+    
+    return erro_medio, nota_r2
 
 
 #essa função serve para testarmos os tipos de modelos matematicos e avaliarmos qual será o melhor para aprofundar  no projeto
