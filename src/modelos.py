@@ -125,3 +125,23 @@ def afinar_modelo_vencedor(X_train,y_train):
 
     # a função devolve o modelo super-afinado
     return mecanico.best_estimator_
+
+def analisar_importancia_variaveis(modelo_rf, nomes_das_colunas):
+    print("\n Abrindo Black Box do modelo...")
+    
+   # aqui é onde o random forest guarda a importância de cada coluna
+    importancias = modelo_rf.feature_importances_
+
+    # criação de uma tabela com o nomme da coluna e sua immportância
+    tabela_importancia = pd.DataFrame({
+        'Característica': nomes_das_colunas,
+        'Importância (%)': importancias * 100
+    })
+    
+    # ordenar do mais importante para o menos importante
+    tabela_importancia = tabela_importancia.sort_values(by='Importância (%)', ascending=False)
+    
+    print("Ranking das variáveis que mais afetam a perda de peso:")
+    print(tabela_importancia.head(10)) # mostra o top 10
+    
+    return tabela_importancia
