@@ -720,3 +720,15 @@ if __name__ == "__main__":
     df_nutricionistas = nutritionistsCSV_limpeza(df_nutricionistas)
     df_resultados = outcomesCSV_limpeza(df_resultados, df_pacientes)
     df_final = integrar_dados(df_resultados, df_pacientes, df_nutricionistas, df_dieta)
+
+    # adicionando bloco para criação do ficheiro da tabela com os dados limpos
+    # retirando as colunas irrelevantes para a previsão do peso
+    colunas_para_remover = ['program_id', 'patient_id', 'record_created_at']
+    df_final = df_final.drop(columns=colunas_para_remover, errors='ignore')
+
+    # transofromando as colunas de string como sexo, dieta e etc.. para colunas binárias
+    df_pronto_para_ia = pd.get_dummies(df_final)
+
+    # guardando o resultado num ficheiro csv
+    df_pronto_para_ia.to_csv('dataset_limpo.csv', index=False)
+    print("\n[SUCESSO] O dataset FINAL foi gerado!")
