@@ -69,25 +69,25 @@ Executar a rotina de limpeza para processar os dados brutos e gerar o ficheiro `
 
 ```bash
 python src/organizacoes.py
-
+```
 ### Passo 2: Descoberta de Padrões
 Identificar as tribos de pacientes. Este script irá gerar o relatório relatorio_tribos.csv para posterior análise.
 
 ```bash
 python src/padroes.py
-
+```
 ### Passo 3: Treino do Modelo Preditivo
 Afinar e avaliar o Random Forest. No final da execução, o modelo será guardado na pasta models/ para utilização futura.
 
 ```bash
 python src/modelos.py
-
+```
 ### Passo 4: Simulador Interativo
 Para testar a capacidade de generalização do modelo e obter o ranking dos melhores nutricionistas para um novo perfil de paciente, inicie o simulador interativo:
 
 ```bash
 python src/simulador_ia.py
-
+```
 
 ## Principais Descobertas e Transparência
 
