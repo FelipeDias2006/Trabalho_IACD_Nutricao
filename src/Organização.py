@@ -730,5 +730,5 @@ if __name__ == "__main__":
     df_pronto_para_ia = pd.get_dummies(df_final)
 
     # guardando o resultado num ficheiro csv
-    df_pronto_para_ia.to_csv('dataset_limpo.csv', index=False)
+    df_pronto_para_ia.to_csv('data/dataset_limpo.csv', index=False)
     print("\n[SUCESSO] O dataset FINAL foi gerado!")

@@ -22,7 +22,7 @@ def descobrir_n_de_grupos(X: pd.DataFrame):
         #ele adiciona a "tensao" registrada nos grupos, quanto mais grupos tiver, menos "tensao" vai ter
         inercia.append(modelo_kmeans.inertia_)
 
-    # --- PARTE DO GRÁFICO ---
+    # criar o visual do grafico
     # Codigo para a tabela do matplotlib
     plt.figure(figsize=(8, 5))
     plt.plot(range(1,11), inercia, marker='o', linestyle='--', color='b')
@@ -30,7 +30,7 @@ def descobrir_n_de_grupos(X: pd.DataFrame):
     plt.xlabel('Número de Grupos (K)')
     plt.ylabel('Inércia (Tensão interna)')
     plt.grid(True)
-    plt.show()  # Isto vai fazer saltar uma janela com o gráfico no seu ecrã!
+    plt.show()
 
 #essa função vai servir para formar os grupos
 #ele vai receber a tabela de dados limpa e o numero de grupos q deve criar
@@ -61,42 +61,50 @@ def agrupar_grupos(X: pd.DataFrame, num_grupos: int):
 
 
 #----BLOCO DE TESTE---
-#BLOCO DE TESTE FEITA POR IA PARA GERAR DADOS FALSOS E TESTARMOS O MODELO PARAC INDENTIFICAÇÕES DE PADRÕES
 if __name__ == "__main__":
-    print("--- INICIANDO O TESTE DE FOGO COM DADOS REAIS (Pacientes) ---")
+    from sklearn.preprocessing import StandardScaler
 
-    # 1. Ler o ficheiro real (garanta que o ficheiro patients.csv está na mesma pasta,
-    # ou ajuste o caminho para '../data/patients.csv' consoante a sua estrutura)
+    print("Iniciando a descoberta de padrões...")
+
     try:
-        df_pacientes = pd.read_csv('patients.csv')
+        # carregando a tabela inteira e limpa
+        df_completo = pd.read_csv('dataset_limpo.csv')
 
-        # 2. O truque para o K-Means não dar erro com dados sujos:
-        # Vamos selecionar apenas 3 colunas que sabemos que são números
-        colunas_para_testar = ['age', 'baseline_weight_kg', 'baseline_bmi']
+        #tensão dos dados
+        descobrir_n_de_grupos(df_completo)
 
-        # O .dropna() simplesmente apaga qualquer linha que tenha um valor vazio (NaN)
-        # Atenção: Fazemos isto SÓ para testar. Na versão final, os seus colegas já terão tratado isto!
-        df_teste = df_pacientes[colunas_para_testar].dropna()
+        # selecionando as colunas que vamos usar para comparar os clientes (fisionomia)
+        # o K-Means vai usar apenas isto para medir quem é parecido com quem
+        colunas_para_agrupar = [
+            'age', 'baseline_weight_kg', 'height_cm',
+            'sleep_hours', 'mean_adherence_pct', 'motivation_score'
+        ]
+        df_para_estudar = df_completo[colunas_para_agrupar].copy()
 
-        df_teste = df_teste[df_teste['baseline_weight_kg'] < 150]
-        print(f"Vamos testar com {len(df_teste)} pacientes limpos de texto e NaNs.")
+        # normalizando as variaveis numa escala de -1 a 1
+        escalador = StandardScaler()
+        dados_escalados = escalador.fit_transform(df_para_estudar)
 
-        # 3. Chamar o gráfico do cotovelo
-        # Feche o gráfico quando ele abrir para o código continuar
-        descobrir_n_de_grupos(df_teste)
+        # indentificar as "tribos" que serão crianas
+        # numero de grupos q sserá criado
+        numero_escolhido = 4
+        modelo = KMeans(n_clusters=numero_escolhido, random_state=42)
+        etiquetas_finais = modelo.fit_predict(dados_escalados)
 
-        # 4. Escolher o número de grupos
-        # Assuma o valor que achar melhor ao olhar para o gráfico (vou usar 3 como exemplo)
-        numero_escolhido = 3
-        tabela_completa, medias_das_tribos = agrupar_grupos(df_teste, numero_escolhido)
+        # indetificar com a etiqueta
+        df_completo['Tribo'] = etiquetas_finais
 
-        # 5. Imprimir o relatório
-        print("\n--- RELATÓRIO DAS TRIBOS REAIS ---")
-        print("Perfil médio de cada grupo encontrado:")
-        print(medias_das_tribos)
+        # calculando a media das colunas
+        relatorio_final = df_completo.groupby('Tribo').mean()
+
+        # exportando a tabela para umm ficheiro csv, para n termos problema com a leitura no terminal
+        nome_ficheiro = 'relatorio_tribos.csv'
+        relatorio_final.to_csv(nome_ficheiro)
+        print(f"\n[SUCESSO] A tabela foi guardada no ficheiro '{nome_ficheiro}'.")
+
+        # printar uma pesquena parte da tabela, para ver se funcionou
+        print("\nUma pequena amostra das Tribos encontradas (Idade e Peso):")
+        print(relatorio_final[['age', 'baseline_weight_kg']].round(2))
 
     except FileNotFoundError:
-        print("Erro: Não encontrei o ficheiro patients.csv. Verifique onde ele está guardado!")
-
-
-
+        print("Erro: Não encontrei o ficheiro 'dataset_limpo.csv'.")
