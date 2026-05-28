@@ -8,12 +8,13 @@ pd.set_option('display.width', None)
 
 
 # Funcao para carregar os dados
+
 def carregar_dados():
 
-    path_pacientes = '../data/patients.csv'
-    path_dieta = '../data/diets.csv'
-    path_nutricionistas = '../data/nutritionists.csv'
-    path_resultados = '../data/outcomes.csv'
+    path_pacientes = 'data/patients.csv'   # Quando tínhamos ../ o Python recuava uma pasta acima do projeto. Se essa pasta não tivesse uma diretoria data/ com os ficheiros CSV, o programa falhava com File Not Found. Ao remover o ../ o Python procura a pasta data/ diretamente dentro da raiz do projeto, onde ela de facto existe.
+    path_dieta = 'data/diets.csv'
+    path_nutricionistas = 'data/nutritionists.csv'
+    path_resultados = 'data/outcomes.csv'
 
     # Carregar cada ficheiro
     df_pacientes = pd.read_csv(path_pacientes)
