@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
     try:
         # ler o dataset limpo
-        dataset_real = pd.read_csv('dataset_limpo.csv')
+        dataset_real = pd.read_csv('data/dataset_limpo.csv')
         print(f"Dados carregados com sucesso! Temos {len(dataset_real)} pacientes para analisar.")
 
         # separar x e y

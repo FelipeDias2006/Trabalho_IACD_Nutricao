@@ -68,14 +68,19 @@ Para reproduzir os resultados do nosso estudo, os scripts devem ser executados p
 Executar a rotina de limpeza para processar os dados brutos e gerar o ficheiro `dataset_limpo.csv` na pasta `data/`.
 
 ```bash
-python src/organizacoes.py
+python src/Organização.py
 ```
 ### Passo 2: Descoberta de Padrões
-Identificar as tribos de pacientes. Este script irá gerar o relatório relatorio_tribos.csv para posterior análise.
+Primeiro instalar a biblioteca sk-learn de forma a executar o ficheiro padrões.py! Identificar as tribos de pacientes. Este script irá gerar o relatório relatorio_tribos.csv para posterior análise. 
+
+```bash
+pip install scikit-learn
+```
 
 ```bash
 python src/padroes.py
 ```
+
 ### Passo 3: Treino do Modelo Preditivo
 Afinar e avaliar o Random Forest. No final da execução, o modelo será guardado na pasta models/ para utilização futura.
 

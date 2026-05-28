@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     try:
         # carregando a tabela inteira e limpa
-        df_completo = pd.read_csv('dataset_limpo.csv')
+        df_completo = pd.read_csv('data/dataset_limpo.csv')
 
         #tensão dos dados
         descobrir_n_de_grupos(df_completo)
